@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Users, Clock, Signal } from "lucide-react"
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Users, Clock, Signal, Radio, Volume2, VolumeX } from "lucide-react"
 
 interface Guest {
   id: string
@@ -15,6 +15,8 @@ interface Guest {
   videoEnabled: boolean
   connectionQuality: "excellent" | "good" | "poor"
   waitTime: string
+  scheduledTime?: string
+  topic?: string
 }
 
 export function GreenRoom() {
@@ -27,6 +29,8 @@ export function GreenRoom() {
       videoEnabled: false,
       connectionQuality: "excellent",
       waitTime: "2:34",
+      scheduledTime: "14:30",
+      topic: "Underground Hip-Hop Scene",
     },
     {
       id: "2",
@@ -36,6 +40,8 @@ export function GreenRoom() {
       videoEnabled: true,
       connectionQuality: "good",
       waitTime: "0:45",
+      scheduledTime: "14:45",
+      topic: "Pirate Radio History",
     },
     {
       id: "3",
@@ -45,6 +51,8 @@ export function GreenRoom() {
       videoEnabled: false,
       connectionQuality: "excellent",
       waitTime: "0:00",
+      scheduledTime: "14:00",
+      topic: "Vinyl vs Digital Debate",
     },
   ])
 
@@ -90,6 +98,10 @@ export function GreenRoom() {
             <Users className="w-5 h-5 text-blue-400" />
             <span className="text-blue-400 font-mono">{guests.length} GUESTS</span>
           </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-purple-600/20 border border-purple-500/30 rounded">
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+            <span className="text-purple-400 font-mono text-sm font-bold">ON AIR</span>
+          </div>
         </div>
       </div>
 
@@ -119,6 +131,56 @@ export function GreenRoom() {
         </CardContent>
       </Card>
 
+      {/* Broadcast Schedule Board */}
+      <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
+            <Radio className="w-5 h-5" />
+            BROADCAST SCHEDULE
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-black/50 p-4 rounded border border-blue-500/30 font-mono">
+            <div className="grid grid-cols-4 gap-4 text-xs text-gray-400 border-b border-blue-500/30 pb-2 mb-3">
+              <span>TIME</span>
+              <span>GUEST</span>
+              <span>TOPIC</span>
+              <span>STATUS</span>
+            </div>
+            {guests.map((guest) => (
+              <div
+                key={guest.id}
+                className="grid grid-cols-4 gap-4 text-sm py-2 border-b border-gray-700/30 last:border-b-0"
+              >
+                <span className="text-yellow-400">{guest.scheduledTime}</span>
+                <span className="text-blue-400">{guest.name}</span>
+                <span className="text-gray-300 truncate">{guest.topic}</span>
+                <div className="flex items-center gap-2">
+                  {guest.status === "live" && (
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                      <span className="text-purple-400 text-xs">LIVE</span>
+                    </div>
+                  )}
+                  {guest.status === "connected" && (
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                      <span className="text-blue-400 text-xs">READY</span>
+                    </div>
+                  )}
+                  {guest.status === "waiting" && (
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                      <span className="text-yellow-400 text-xs">STANDBY</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Guest Queue */}
       <div className="grid gap-4">
         {guests.map((guest) => (
@@ -128,7 +190,6 @@ export function GreenRoom() {
                 <div className="w-48 h-32 bg-black rounded-lg border-2 border-blue-500/30 relative overflow-hidden flex-shrink-0">
                   {guest.videoEnabled ? (
                     <div className="w-full h-full bg-gradient-to-br from-blue-900/50 to-purple-900/50 flex items-center justify-center relative">
-                      {/* Simulated video feed with scan lines */}
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-400/10 to-transparent animate-pulse" />
                       <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                         <span className="text-white font-mono font-bold text-lg">
@@ -138,13 +199,11 @@ export function GreenRoom() {
                             .join("")}
                         </span>
                       </div>
-                      {/* Video quality indicator */}
                       <div className="absolute top-2 right-2">
                         <div
                           className={`w-2 h-2 rounded-full ${getQualityColor(guest.connectionQuality)} animate-pulse`}
                         />
                       </div>
-                      {/* Audio level indicator */}
                       {guest.audioEnabled && (
                         <div className="absolute bottom-2 left-2 flex gap-1">
                           {[...Array(4)].map((_, i) => (
@@ -164,8 +223,21 @@ export function GreenRoom() {
                       <VideoOff className="w-8 h-8 text-gray-500" />
                     </div>
                   )}
-                  {/* Video window glow effect */}
                   <div className="absolute -inset-1 bg-blue-400/20 rounded-lg blur-sm -z-10" />
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    {guest.status === "live" && (
+                      <div className="flex items-center gap-1 bg-black/70 px-2 py-1 rounded text-xs">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+                        <span className="text-purple-400 font-mono font-bold">ON AIR</span>
+                      </div>
+                    )}
+                    {guest.status === "connected" && (
+                      <div className="flex items-center gap-1 bg-black/70 px-2 py-1 rounded text-xs">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                        <span className="text-blue-400 font-mono font-bold">STANDBY</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex-1 flex items-center justify-between">
@@ -179,26 +251,60 @@ export function GreenRoom() {
                           <span className="text-xs text-gray-400 font-mono">{guest.waitTime}</span>
                         </div>
                       </div>
+                      {guest.topic && <p className="text-xs text-gray-500 font-mono mt-1">{guest.topic}</p>}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-6">
+                    {/* Intercom Panel */}
+                    <div className="bg-black/50 border border-blue-500/30 rounded p-3 min-w-[200px]">
+                      <div className="text-xs text-gray-400 font-mono mb-2">INTERCOM CONTROLS</div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant={guest.audioEnabled ? "default" : "outline"}
+                            className="w-8 h-8 p-0 bg-blue-600/20 border-blue-500/30"
+                          >
+                            {guest.audioEnabled ? (
+                              <Mic className="w-4 h-4 text-blue-400" />
+                            ) : (
+                              <MicOff className="w-4 h-4 text-gray-400" />
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={guest.videoEnabled ? "default" : "outline"}
+                            className="w-8 h-8 p-0 bg-blue-600/20 border-blue-500/30"
+                          >
+                            {guest.videoEnabled ? (
+                              <Video className="w-4 h-4 text-blue-400" />
+                            ) : (
+                              <VideoOff className="w-4 h-4 text-gray-400" />
+                            )}
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" className="w-8 h-8 p-0 bg-yellow-600/20 border-yellow-500/30">
+                            <Volume2 className="w-4 h-4 text-yellow-400" />
+                          </Button>
+                          <Button size="sm" className="w-8 h-8 p-0 bg-purple-600/20 border-purple-500/30">
+                            <VolumeX className="w-4 h-4 text-purple-400" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-xs text-gray-400 font-mono">TALK</span>
+                        <span className="text-xs text-gray-400 font-mono">CUE</span>
+                      </div>
+                    </div>
+
                     {/* Connection Quality */}
                     <div className="flex items-center gap-2">
                       <Signal className={`w-4 h-4 ${getQualityColor(guest.connectionQuality)}`} />
                       <span className={`text-xs font-mono ${getQualityColor(guest.connectionQuality)}`}>
                         {guest.connectionQuality.toUpperCase()}
                       </span>
-                    </div>
-
-                    {/* Audio/Video Controls */}
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" variant={guest.audioEnabled ? "default" : "outline"} className="w-8 h-8 p-0">
-                        {guest.audioEnabled ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-                      </Button>
-                      <Button size="sm" variant={guest.videoEnabled ? "default" : "outline"} className="w-8 h-8 p-0">
-                        {guest.videoEnabled ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
-                      </Button>
                     </div>
 
                     {/* Action Buttons */}

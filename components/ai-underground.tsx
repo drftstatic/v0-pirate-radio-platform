@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +22,10 @@ import {
   Activity,
   Radio,
   AudioWaveform as Waveform,
+  Terminal,
+  Scissors,
+  Flame,
+  BarChart3,
 } from "lucide-react"
 
 interface AIFeature {
@@ -88,6 +92,35 @@ export function AIUnderground() {
   const [aiPrompt, setAiPrompt] = useState("")
   const [aiResponse, setAiResponse] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+  const [transcription, setTranscription] = useState("")
+  const [isTranscribing, setIsTranscribing] = useState(false)
+  const [viralClips, setViralClips] = useState([
+    { id: 1, timestamp: "02:34", content: "That underground beat drop", viralScore: 87, signal: 92 },
+    { id: 2, timestamp: "15:22", content: "Raw authentic storytelling", viralScore: 94, signal: 88 },
+    { id: 3, timestamp: "28:45", content: "Unexpected guest appearance", viralScore: 76, signal: 95 },
+  ])
+  const [contentSuggestions] = useState([
+    { title: "UNDERGROUND MANIFESTO", type: "Editorial", urgency: "HIGH" },
+    { title: "Pirate Radio History", type: "Feature", urgency: "MED" },
+    { title: "DIY Equipment Guide", type: "Tutorial", urgency: "LOW" },
+    { title: "Artist Spotlight", type: "Interview", urgency: "HIGH" },
+  ])
+
+  useEffect(() => {
+    if (isTranscribing) {
+      const interval = setInterval(() => {
+        const phrases = [
+          "Welcome to the underground...",
+          "This is where authentic voices rise...",
+          "Breaking through the static...",
+          "Raw, unfiltered truth...",
+          "The revolution will be broadcasted...",
+        ]
+        setTranscription((prev) => prev + phrases[Math.floor(Math.random() * phrases.length)] + " ")
+      }, 2000)
+      return () => clearInterval(interval)
+    }
+  }, [isTranscribing])
 
   const toggleFeature = (id: string) => {
     setAIFeatures((features) =>
@@ -183,6 +216,153 @@ export function AIUnderground() {
               <pre className="text-blue-400 font-mono text-sm whitespace-pre-wrap">{aiResponse}</pre>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Real-time Transcription Window */}
+      <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
+            <Terminal className="w-5 h-5" />
+            REAL-TIME TRANSCRIPTION
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isTranscribing ? "bg-blue-400 animate-pulse" : "bg-gray-500"}`} />
+              <span className="text-gray-400 font-mono text-sm">{isTranscribing ? "TRANSCRIBING..." : "STANDBY"}</span>
+            </div>
+            <Button
+              onClick={() => {
+                setIsTranscribing(!isTranscribing)
+                if (!isTranscribing) setTranscription("")
+              }}
+              variant="outline"
+              size="sm"
+              className="border-blue-500/30 text-blue-400 hover:bg-blue-500/20 font-mono"
+            >
+              {isTranscribing ? "STOP" : "START"}
+            </Button>
+          </div>
+          <div className="bg-black/50 border border-blue-500/30 rounded-lg p-4 min-h-[120px] font-mono text-sm">
+            <div className="text-blue-400 mb-2">$ pirate-radio-transcribe --live --underground</div>
+            <div className="text-green-400">
+              {transcription || "Waiting for audio input..."}
+              {isTranscribing && <span className="animate-pulse">█</span>}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Content Suggestions as Underground Zine Layouts */}
+      <Card className="bg-slate-900/50 border-purple-500/30 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-purple-400 font-mono flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            UNDERGROUND ZINE SUGGESTIONS
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {contentSuggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                className="bg-black/30 border border-purple-500/30 p-4 rounded-lg transform rotate-1 hover:rotate-0 transition-transform"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="text-purple-400 font-mono font-bold text-sm uppercase tracking-wider">
+                    {suggestion.title}
+                  </h3>
+                  <Badge
+                    className={`text-xs font-mono ${
+                      suggestion.urgency === "HIGH"
+                        ? "bg-pink-500/20 text-pink-400 border-pink-500/30"
+                        : suggestion.urgency === "MED"
+                          ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                          : "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                    }`}
+                  >
+                    {suggestion.urgency}
+                  </Badge>
+                </div>
+                <div className="text-gray-400 font-mono text-xs mb-3">{suggestion.type}</div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-1 bg-purple-500/30 rounded-full">
+                    <div className="h-full bg-purple-400 rounded-full" style={{ width: `${Math.random() * 100}%` }} />
+                  </div>
+                  <span className="text-purple-400 font-mono text-xs">READY</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Viral Clip Detector */}
+      <Card className="bg-slate-900/50 border-pink-500/30 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-pink-400 font-mono flex items-center gap-2">
+            <Flame className="w-5 h-5" />
+            VIRAL CLIP DETECTOR
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="text-center">
+              <div className="text-2xl font-mono font-bold text-pink-400">3</div>
+              <div className="text-xs text-gray-400 font-mono">CLIPS DETECTED</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-mono font-bold text-yellow-400">94%</div>
+              <div className="text-xs text-gray-400 font-mono">AVG VIRAL SCORE</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-mono font-bold text-blue-400">LIVE</div>
+              <div className="text-xs text-gray-400 font-mono">SCANNING</div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {viralClips.map((clip) => (
+              <div key={clip.id} className="bg-black/30 border border-pink-500/30 p-4 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <Scissors className="w-4 h-4 text-pink-400" />
+                    <span className="text-pink-400 font-mono text-sm font-bold">{clip.timestamp}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-yellow-400" />
+                    <span className="text-yellow-400 font-mono text-sm">{clip.viralScore}%</span>
+                  </div>
+                </div>
+                <p className="text-gray-300 font-mono text-sm mb-3">{clip.content}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 font-mono text-xs">SIGNAL STRENGTH</span>
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-1 h-4 rounded-full ${
+                            i < Math.floor(clip.signal / 20) ? "bg-pink-400" : "bg-gray-600"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-pink-400 font-mono text-xs">{clip.signal}%</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-pink-500/30 text-pink-400 hover:bg-pink-500/20 font-mono text-xs bg-transparent"
+                  >
+                    EXTRACT
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 

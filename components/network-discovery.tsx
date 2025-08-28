@@ -19,6 +19,13 @@ import {
   Headphones,
   Wifi,
   Power as Tower,
+  Calendar,
+  Clock,
+  Star,
+  MessageSquare,
+  Pin,
+  UserPlus,
+  Mic,
 } from "lucide-react"
 
 interface Station {
@@ -33,6 +40,43 @@ interface Station {
   description: string
   distance: string
   liked: boolean
+}
+
+interface Show {
+  id: string
+  title: string
+  host: string
+  time: string
+  date: string
+  genre: string
+  description: string
+  featured: boolean
+  attendees: number
+}
+
+interface Creator {
+  id: string
+  name: string
+  handle: string
+  genre: string
+  followers: number
+  shows: number
+  rating: number
+  avatar: string
+  bio: string
+  badges: string[]
+  online: boolean
+}
+
+interface CollabPost {
+  id: string
+  author: string
+  title: string
+  content: string
+  type: "collab" | "gig" | "remix" | "feature"
+  timestamp: string
+  replies: number
+  pinned: boolean
 }
 
 export function NetworkDiscovery() {
@@ -104,10 +148,122 @@ export function NetworkDiscovery() {
     },
   ])
 
+  const [shows] = useState<Show[]>([
+    {
+      id: "1",
+      title: "MIDNIGHT FREQUENCY",
+      host: "DJ Neon",
+      time: "00:00",
+      date: "TONIGHT",
+      genre: "Synthwave",
+      description: "Late night vibes from the underground",
+      featured: true,
+      attendees: 847,
+    },
+    {
+      id: "2",
+      title: "STATIC DREAMS LIVE",
+      host: "Echo Chamber",
+      time: "22:30",
+      date: "FRI",
+      genre: "Ambient",
+      description: "Ethereal soundscapes & guest interviews",
+      featured: false,
+      attendees: 423,
+    },
+    {
+      id: "3",
+      title: "REBEL TRANSMISSION",
+      host: "The Resistance",
+      time: "20:00",
+      date: "SAT",
+      genre: "Industrial",
+      description: "Raw beats from the underground movement",
+      featured: true,
+      attendees: 1203,
+    },
+  ])
+
+  const [creators] = useState<Creator[]>([
+    {
+      id: "1",
+      name: "DJ Neon",
+      handle: "@djneon",
+      genre: "Synthwave",
+      followers: 12847,
+      shows: 156,
+      rating: 4.9,
+      avatar: "N",
+      bio: "Retro-futuristic beats from Neo Tokyo",
+      badges: ["VERIFIED", "TOP RATED", "PIONEER"],
+      online: true,
+    },
+    {
+      id: "2",
+      name: "Echo Chamber",
+      handle: "@echochamber",
+      genre: "Ambient",
+      followers: 8432,
+      shows: 89,
+      rating: 4.7,
+      avatar: "E",
+      bio: "Creating ethereal soundscapes for digital nomads",
+      badges: ["VERIFIED", "RISING STAR"],
+      online: false,
+    },
+    {
+      id: "3",
+      name: "The Resistance",
+      handle: "@theresistance",
+      genre: "Industrial",
+      followers: 15623,
+      shows: 203,
+      rating: 4.8,
+      avatar: "R",
+      bio: "Raw industrial beats from the underground",
+      badges: ["VERIFIED", "LEGEND", "ACTIVIST"],
+      online: true,
+    },
+  ])
+
+  const [collabPosts] = useState<CollabPost[]>([
+    {
+      id: "1",
+      author: "DJ Neon",
+      title: "Looking for vocalist for synthwave track",
+      content: "Need someone with that retro-futuristic vibe for my new track 'Digital Dreams'. Hit me up!",
+      type: "collab",
+      timestamp: "2h ago",
+      replies: 12,
+      pinned: true,
+    },
+    {
+      id: "2",
+      author: "Echo Chamber",
+      title: "Remix contest - 'Static Dreams'",
+      content: "Dropping stems for my latest track. Best remix gets featured on my next show!",
+      type: "remix",
+      timestamp: "4h ago",
+      replies: 8,
+      pinned: false,
+    },
+    {
+      id: "3",
+      author: "The Resistance",
+      title: "Underground venue booking - Saturday slots",
+      content: "Got some prime time slots at the Underground Base. Looking for industrial/breakbeat acts.",
+      type: "gig",
+      timestamp: "6h ago",
+      replies: 15,
+      pinned: false,
+    },
+  ])
+
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedGenre, setSelectedGenre] = useState("all")
   const [scanProgress, setScanProgress] = useState(0)
   const [isScanning, setIsScanning] = useState(false)
+  const [activeTab, setActiveTab] = useState<"stations" | "shows" | "creators" | "collab">("stations")
 
   const genres = ["all", "synthwave", "ambient", "industrial", "dark ambient", "breakbeat"]
 
@@ -172,7 +328,7 @@ export function NetworkDiscovery() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-mono font-bold text-blue-400 glow-text">NETWORK DISCOVERY</h1>
-          <p className="text-gray-400 font-mono">Underground Station Scanner & Network Map</p>
+          <p className="text-gray-400 font-mono">Underground Station Scanner & Community Hub</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -186,147 +342,409 @@ export function NetworkDiscovery() {
         </div>
       </div>
 
-      {/* Scanner Controls */}
-      <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
-            <Tower className="w-5 h-5" />
-            FREQUENCY SCANNER
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search stations, genres, locations..."
-                    className="bg-slate-800/50 border-blue-500/30 text-blue-400 font-mono pl-10"
-                  />
-                </div>
-                <select
-                  value={selectedGenre}
-                  onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="bg-slate-800/50 border border-blue-500/30 text-blue-400 font-mono px-3 py-2 rounded-md"
-                >
-                  {genres.map((genre) => (
-                    <option key={genre} value={genre} className="bg-slate-800">
-                      {genre.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <Button
-              onClick={startScan}
-              disabled={isScanning}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-mono"
-            >
-              {isScanning ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  SCANNING...
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Wifi className="w-4 h-4" />
-                  SCAN NETWORK
-                </div>
-              )}
-            </Button>
-          </div>
-
-          {isScanning && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm font-mono">
-                <span className="text-gray-400">SCANNING FREQUENCIES</span>
-                <span className="text-blue-400">{scanProgress}%</span>
-              </div>
-              <Progress value={scanProgress} className="h-2 bg-slate-800" />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Station Grid */}
-      <div className="grid gap-4">
-        {filteredStations.map((station) => (
-          <Card key={station.id} className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-4 flex-1">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                    <Radio className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-blue-400 font-mono font-bold text-lg">{station.name}</h3>
-                      <Badge className={getStatusColor(station.status)}>{station.status.toUpperCase()}</Badge>
-                      <Badge variant="outline" className="text-purple-400 border-purple-500/30">
-                        {station.genre.toUpperCase()}
-                      </Badge>
-                    </div>
-                    <p className="text-gray-400 font-mono text-sm mb-3">{station.description}</p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm font-mono">
-                      <div className="flex items-center gap-2">
-                        <Signal className={`w-4 h-4 ${getSignalColor(station.signal)}`} />
-                        <span className="text-gray-400">FREQ:</span>
-                        <span className="text-blue-400">{station.frequency}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-400">LOC:</span>
-                        <span className="text-blue-400">{station.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-400">LISTENERS:</span>
-                        <span className="text-green-400">{station.listeners.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-400">DIST:</span>
-                        <span className="text-yellow-400">{station.distance}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => toggleLike(station.id)}
-                    className={`w-10 h-10 p-0 ${
-                      station.liked ? "bg-pink-500/20 border-pink-500/30 text-pink-400" : "bg-transparent"
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${station.liked ? "fill-current" : ""}`} />
-                  </Button>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-mono">
-                    <Headphones className="w-4 h-4 mr-2" />
-                    TUNE IN
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b border-blue-500/30">
+        {[
+          { id: "stations", label: "STATIONS", icon: Radio },
+          { id: "shows", label: "SHOWS", icon: Calendar },
+          { id: "creators", label: "CREATORS", icon: Users },
+          { id: "collab", label: "COLLAB BOARD", icon: MessageSquare },
+        ].map((tab) => (
+          <Button
+            key={tab.id}
+            variant="ghost"
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`font-mono ${
+              activeTab === tab.id
+                ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/10"
+                : "text-gray-400 hover:text-blue-400"
+            }`}
+          >
+            <tab.icon className="w-4 h-4 mr-2" />
+            {tab.label}
+          </Button>
         ))}
       </div>
 
-      {filteredStations.length === 0 && (
-        <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
-          <CardContent className="p-12 text-center">
-            <Radio className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-gray-400 font-mono text-lg mb-2">NO STATIONS FOUND</h3>
-            <p className="text-gray-500 font-mono text-sm">
-              Try adjusting your search criteria or scan for new frequencies
-            </p>
-          </CardContent>
-        </Card>
+      {activeTab === "stations" && (
+        <>
+          {/* Scanner Controls */}
+          <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
+                <Tower className="w-5 h-5" />
+                FREQUENCY SCANNER
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search stations, genres, locations..."
+                        className="bg-slate-800/50 border-blue-500/30 text-blue-400 font-mono pl-10"
+                      />
+                    </div>
+                    <select
+                      value={selectedGenre}
+                      onChange={(e) => setSelectedGenre(e.target.value)}
+                      className="bg-slate-800/50 border border-blue-500/30 text-blue-400 font-mono px-3 py-2 rounded-md"
+                    >
+                      {genres.map((genre) => (
+                        <option key={genre} value={genre} className="bg-slate-800">
+                          {genre.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <Button
+                  onClick={startScan}
+                  disabled={isScanning}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-mono"
+                >
+                  {isScanning ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      SCANNING...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Wifi className="w-4 h-4" />
+                      SCAN NETWORK
+                    </div>
+                  )}
+                </Button>
+              </div>
+
+              {isScanning && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm font-mono">
+                    <span className="text-gray-400">SCANNING FREQUENCIES</span>
+                    <span className="text-blue-400">{scanProgress}%</span>
+                  </div>
+                  <Progress value={scanProgress} className="h-2 bg-slate-800" />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Station Grid */}
+          <div className="grid gap-4">
+            {filteredStations.map((station) => (
+              <Card key={station.id} className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                        <Radio className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-blue-400 font-mono font-bold text-lg">{station.name}</h3>
+                          <Badge className={getStatusColor(station.status)}>{station.status.toUpperCase()}</Badge>
+                          <Badge variant="outline" className="text-purple-400 border-purple-500/30">
+                            {station.genre.toUpperCase()}
+                          </Badge>
+                        </div>
+                        <p className="text-gray-400 font-mono text-sm mb-3">{station.description}</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm font-mono">
+                          <div className="flex items-center gap-2">
+                            <Signal className={`w-4 h-4 ${getSignalColor(station.signal)}`} />
+                            <span className="text-gray-400">FREQ:</span>
+                            <span className="text-blue-400">{station.frequency}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-400">LOC:</span>
+                            <span className="text-blue-400">{station.location}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-400">LISTENERS:</span>
+                            <span className="text-green-400">{station.listeners.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-400">DIST:</span>
+                            <span className="text-yellow-400">{station.distance}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toggleLike(station.id)}
+                        className={`w-10 h-10 p-0 ${
+                          station.liked ? "bg-pink-500/20 border-pink-500/30 text-pink-400" : "bg-transparent"
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${station.liked ? "fill-current" : ""}`} />
+                      </Button>
+                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-mono">
+                        <Headphones className="w-4 h-4 mr-2" />
+                        TUNE IN
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {filteredStations.length === 0 && (
+            <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <Radio className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-gray-400 font-mono text-lg mb-2">NO STATIONS FOUND</h3>
+                <p className="text-gray-500 font-mono text-sm">
+                  Try adjusting your search criteria or scan for new frequencies
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Underground Show Flyers Section */}
+      {activeTab === "shows" && (
+        <div className="space-y-6">
+          <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                UNDERGROUND SHOW SCHEDULE
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {shows.map((show) => (
+                  <Card
+                    key={show.id}
+                    className={`bg-gradient-to-r ${
+                      show.featured
+                        ? "from-purple-900/30 to-blue-900/30 border-purple-500/50"
+                        : "from-slate-800/30 to-slate-900/30 border-blue-500/30"
+                    } backdrop-blur-sm transform rotate-1 hover:rotate-0 transition-transform`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-2xl font-mono font-bold text-blue-400 tracking-wider">{show.title}</h3>
+                            {show.featured && (
+                              <Badge className="bg-pink-500/20 text-pink-400 border-pink-500/30 font-mono">
+                                FEATURED
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3 font-mono text-sm">
+                            <div className="flex items-center gap-2">
+                              <Mic className="w-4 h-4 text-purple-400" />
+                              <span className="text-gray-400">HOST:</span>
+                              <span className="text-purple-400">{show.host}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-yellow-400" />
+                              <span className="text-gray-400">TIME:</span>
+                              <span className="text-yellow-400">{show.time}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4 text-blue-400" />
+                              <span className="text-gray-400">DATE:</span>
+                              <span className="text-blue-400">{show.date}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-green-400" />
+                              <span className="text-gray-400">RSVP:</span>
+                              <span className="text-green-400">{show.attendees}</span>
+                            </div>
+                          </div>
+                          <p className="text-gray-300 font-mono text-sm mb-3">{show.description}</p>
+                          <Badge variant="outline" className="text-purple-400 border-purple-500/30 font-mono">
+                            {show.genre.toUpperCase()}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Button size="sm" className="bg-purple-600 hover:bg-purple-700 font-mono">
+                            RSVP
+                          </Button>
+                          <Button size="sm" variant="outline" className="font-mono bg-transparent">
+                            REMIND
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Creator Trading Cards Section */}
+      {activeTab === "creators" && (
+        <div className="space-y-6">
+          <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                CREATOR PROFILES
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {creators.map((creator) => (
+                  <Card
+                    key={creator.id}
+                    className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/30 backdrop-blur-sm hover:scale-105 transition-transform"
+                  >
+                    <CardContent className="p-6">
+                      <div className="text-center mb-4">
+                        <div className="relative inline-block">
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2">
+                            {creator.avatar}
+                          </div>
+                          {creator.online && (
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
+                          )}
+                        </div>
+                        <h3 className="text-blue-400 font-mono font-bold text-lg">{creator.name}</h3>
+                        <p className="text-purple-400 font-mono text-sm">{creator.handle}</p>
+                      </div>
+
+                      <div className="space-y-3 mb-4">
+                        <div className="flex justify-between font-mono text-sm">
+                          <span className="text-gray-400">FOLLOWERS:</span>
+                          <span className="text-blue-400">{creator.followers.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between font-mono text-sm">
+                          <span className="text-gray-400">SHOWS:</span>
+                          <span className="text-purple-400">{creator.shows}</span>
+                        </div>
+                        <div className="flex justify-between font-mono text-sm">
+                          <span className="text-gray-400">RATING:</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-yellow-400">{creator.rating}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-300 font-mono text-xs mb-4">{creator.bio}</p>
+
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {creator.badges.map((badge) => (
+                          <Badge
+                            key={badge}
+                            className="text-xs font-mono bg-pink-500/20 text-pink-400 border-pink-500/30"
+                          >
+                            {badge}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700 font-mono">
+                          <UserPlus className="w-4 h-4 mr-1" />
+                          FOLLOW
+                        </Button>
+                        <Button size="sm" variant="outline" className="font-mono bg-transparent">
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Collaboration Message Wall */}
+      {activeTab === "collab" && (
+        <div className="space-y-6">
+          <Card className="bg-slate-900/50 border-blue-500/30 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-blue-400 font-mono flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                UNDERGROUND COLLABORATION BOARD
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <Button className="bg-purple-600 hover:bg-purple-700 font-mono">
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  POST COLLABORATION
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {collabPosts.map((post) => (
+                  <Card
+                    key={post.id}
+                    className={`${
+                      post.pinned
+                        ? "bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-500/50"
+                        : "bg-slate-800/30 border-blue-500/30"
+                    } backdrop-blur-sm`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          {post.pinned && <Pin className="w-4 h-4 text-yellow-400" />}
+                          <h3 className="text-blue-400 font-mono font-bold">{post.title}</h3>
+                          <Badge
+                            className={`font-mono text-xs ${
+                              post.type === "collab"
+                                ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
+                                : post.type === "remix"
+                                  ? "bg-pink-500/20 text-pink-400 border-pink-500/30"
+                                  : "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                            }`}
+                          >
+                            {post.type.toUpperCase()}
+                          </Badge>
+                        </div>
+                        <span className="text-gray-400 font-mono text-sm">{post.timestamp}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-sm font-bold text-white">
+                          {post.author[0]}
+                        </div>
+                        <span className="text-purple-400 font-mono text-sm">{post.author}</span>
+                      </div>
+                      <p className="text-gray-300 font-mono text-sm mb-3">{post.content}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <Button size="sm" variant="ghost" className="text-gray-400 hover:text-blue-400 font-mono">
+                            <MessageSquare className="w-4 h-4 mr-1" />
+                            {post.replies} REPLIES
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-gray-400 hover:text-pink-400 font-mono">
+                            <Heart className="w-4 h-4 mr-1" />
+                            LIKE
+                          </Button>
+                        </div>
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 font-mono">
+                          RESPOND
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )

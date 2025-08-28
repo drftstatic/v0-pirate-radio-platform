@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Radio, Users, Bot, MessageSquare, Radar, BarChart3, Settings, HelpCircle } from "lucide-react"
+import { Radio, Users, Bot, MessageSquare, Radar, BarChart3, Settings, HelpCircle, Wrench } from "lucide-react"
 
 const navItems = [
   { icon: Radio, label: "MISSION CONTROL", href: "/" },
@@ -11,6 +11,7 @@ const navItems = [
   { icon: MessageSquare, label: "THE FREQUENCY", href: "/frequency" },
   { icon: Radar, label: "NETWORK DISCOVERY", href: "/network" },
   { icon: BarChart3, label: "SIGNAL ANALYSIS", href: "/analytics" },
+  { icon: Wrench, label: "ENGINEERING BAY", href: "/engineering" },
 ]
 
 export function Sidebar() {
@@ -43,7 +44,7 @@ export function Sidebar() {
           <div className="space-y-2">
             <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 transition-all">
               <Settings className="h-5 w-5" />
-              <span className="text-sm font-medium tracking-wide">ENGINEERING</span>
+              <span className="text-sm font-medium tracking-wide">SYSTEM CONFIG</span>
             </button>
             <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 transition-all">
               <HelpCircle className="h-5 w-5" />
